@@ -1,5 +1,5 @@
 body {
-    background-image: url('/img/fondos/goku_perfil.jfif');
+    background-image: url('../img/fondos/goku_perfil.jfif');
     background-attachment: fixed;
     min-height: 80vh;
     background-size: cover;
@@ -40,8 +40,8 @@ body {
 }
 
 .profile-icon {
-    font-size: 80px;  /* Tamaño grande del ícono */
-    color: #ff7300;   /* Color gris oscuro */
+    font-size: 80px;  
+    color: #ff7300;  
     margin-bottom: 20px;
 }
 
