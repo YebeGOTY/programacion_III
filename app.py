@@ -1,38 +1,33 @@
+import os
 from flask import Flask, request, render_template, redirect, url_for, session, flash
 from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from itsdangerous import URLSafeTimedSerializer as Serializer
-import os
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
-# Clave secreta para sesiones
 app.secret_key = "holahola"
 
-# Configuración de MongoDB Atlas
 client = MongoClient(os.getenv("MONGO_URI"))
-db = client['db1'] #Nombre de tu base de datos aquí
-collection = db['usuarios'] #Nombre de tu colección aquí
+db = client['db1'] 
+collection = db['usuarios'] 
 
-# Configuración de SendGrid
-SENDGRID_API_KEY = os.getenv("SENDGRID_KEY") # Usa tu clave API de SendGrid aquí
+SENDGRID_API_KEY = os.getenv("SENDGRID_KEY") 
 
-# Serializador para crear y verificar tokens
 serializer = Serializer(app.secret_key, salt='password-reset-salt')
 
-# Función para enviar correos
 def enviar_email(destinatario, asunto, cuerpo):
     mensaje = Mail(
-        from_email='miniyebe@gmail.com',  
+        from_email='cinenext758@gmail.com',
         to_emails=destinatario,
         subject=asunto,
         html_content=cuerpo
     )
     try:
-        sg = SendGridAPIClient(SENDGRID_API_KEY)  # Usa tu clave API de SendGrid directamente
+        sg = SendGridAPIClient(SENDGRID_API_KEY) 
         response = sg.send(mensaje)
         print(f"Correo enviado con éxito! Status code: {response.status_code}")
     except Exception as e:
@@ -41,11 +36,11 @@ def enviar_email(destinatario, asunto, cuerpo):
 @app.route('/')
 def home():
     if 'usuario' not in session:
-        return redirect(url_for('login')) 
+        return redirect(url_for('login'))
     return redirect(url_for('pagina_principal'))
 
 @app.route('/register', methods=['GET', 'POST'])
-def registro(): 
+def registro():
     if request.method == 'POST':
         usuario = request.form['usuario']
         email = request.form['email']
@@ -53,7 +48,7 @@ def registro():
 
         if collection.find_one({'email': email}):
             flash("El correo electrónico ya está registrado.")
-            return redirect(url_for('registro')) 
+            return redirect(url_for('registro'))
 
         hashed_password = bcrypt.generate_password_hash(contrasena).decode('utf-8')
 
@@ -64,7 +59,7 @@ def registro():
         })
         
         session['usuario'] = usuario
-        return redirect(url_for('index')) 
+        return redirect(url_for('pagina_principal'))
 
     return render_template('register.html')
 
@@ -78,7 +73,7 @@ def login():
         
         if user and bcrypt.check_password_hash(user['contrasena'], contrasena):
             session['usuario'] = usuario
-            return redirect(url_for('index')) 
+            return redirect(url_for('pagina_principal'))
         else:
             flash("Usuario o contraseña incorrectos.")
             return render_template('login.html')
@@ -88,18 +83,16 @@ def login():
 @app.route('/pagina_principal')
 def pagina_principal():
     if 'usuario' not in session:
-        return redirect(url_for('login')) 
-    
+        return redirect(url_for('login'))
     return render_template('index.html', usuario=session['usuario'])
 
 @app.route('/mi_perfil')
 def mi_perfil():
     if 'usuario' not in session:
-        return redirect(url_for('login')) 
+        return redirect(url_for('login'))
     
     usuario = session['usuario']
     user_data = collection.find_one({'usuario': usuario})
-    
     return render_template('mi_perfil.html', usuario=user_data['usuario'], email=user_data['email'])
 
 @app.route('/recuperar_contrasena', methods=['GET', 'POST'])
@@ -148,4 +141,4 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)
