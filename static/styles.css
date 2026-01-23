@@ -1,5 +1,5 @@
 body {
-    background-image: url('../img/fondos/fondo_login.jfif');
+    background-image: url('./img/fondos/fondo_login.jfif');
     background-attachment: fixed;
     min-height: 80vh;
     background-size: cover;

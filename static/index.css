@@ -1,13 +1,11 @@
-/* General Styles */
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #ffffff; /* Fondo LightGray */
-    color: #000000; /* Texto negro */
+    background-color: #ffffff; 
+    color: #000000; 
     margin: 0;
     padding: 0;
 }
 
-/* Navbar */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -78,7 +76,7 @@ body {
     box-shadow: 0 8px 16px rgba(247, 247, 247, 0.2);
     z-index: 1;
     border-radius: 6px;
-    padding: 10px 0; /* Espaciado interno */
+    padding: 10px 0; 
 }
 
 .dropdown-content a {
@@ -98,7 +96,6 @@ body {
     display: block;
 }
 
-/* Hamburger Menu */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -117,7 +114,6 @@ body {
     border-radius: 3px;
 }
 
-/* Mobile Menu */
 .mobile-menu {
     display: flex;
     flex-direction: column;
@@ -145,7 +141,6 @@ body {
     background-color: #6d6d6d;
 }
 
-/* Main Page */
 .main-container {
     padding: 50px 40px;
     display: flex;
@@ -169,7 +164,6 @@ body {
     margin: 0 auto;
 }
 
-/* Novedades Section */
 .novedades {
     margin-top: 50px;
     text-align: center;
@@ -199,12 +193,11 @@ body {
     color: #000000;
 }
 
-/* Footer */
 footer {
     text-align: center;
     padding: 20px;
-    background-color: #ff7b00; /* Fondo gris oscuro */
-    color: #ffffff; /* Texto gris claro */
+    background-color: #ff7b00;
+    color: #ffffff; 
     font-size: 14px;
     margin-top: 20px;
 }
@@ -219,7 +212,6 @@ footer a:hover {
     color: #ffffff;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .navbar-menu {
         display: none;
