@@ -46,9 +46,9 @@
                         <td>{{ u.email }}</td>
                         <td>
                             {% if u.get('role') == 'admin' %}
-                                <span class="badge-admin">ADMINISTRADOR</span>
+                                <span style="color: #ff7b00; font-weight: bold;">Admin</span>
                             {% else %}
-                                <span class="badge-cliente">CLIENTE</span>
+                                <span style="color: #666; font-weight: bold;">Cliente</span>
                             {% endif %}
                         </td>
                     </tr>

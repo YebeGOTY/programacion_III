@@ -148,11 +148,10 @@ def restablecer_contrasena(token):
     return render_template('restablecer_contrasena.html')
 
 @app.route('/admin')
-@admin_required # <--- Solo los admin pueden entrar aquí
+@admin_required
 def panel_admin():
-    # Aquí puedes listar todos los usuarios registrados
     todos_los_usuarios = list(collection.find())
-    return render_template('admin_panel.html', usuarios=todos_los_usuarios)
+    return render_template('panel_admin.html', usuarios=todos_los_usuarios)
 
 @app.route('/logout')
 def logout():
