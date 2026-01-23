@@ -6,7 +6,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     font-family: 'Arial', sans-serif;
-    background-color: #ff7300;  /* Fondo LightGray */
+    background-color: #ff7300; 
     color: #000000;
     margin: 0;
     padding: 0;
@@ -61,7 +61,7 @@ body {
 
 .profile-item span {
     font-weight: bold;
-    color: #000000;  /* Color negro para el texto destacado */
+    color: #000000;  
 }
 
 .btn-back {

@@ -87,7 +87,7 @@ body {
     text-transform: uppercase;
     cursor: pointer;
     transition: all 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 15px rgba(167, 167, 167, 0.1); /* Sombra más tenue */
+    box-shadow: 0 4px 15px rgba(167, 167, 167, 0.1); 
 }
 
 .btn:hover {
