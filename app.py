@@ -43,7 +43,7 @@ def home():
         return redirect(url_for('/templates/login.html'))
     return redirect(url_for('/templates/index.html'))
 
-@app.route('./templates/register.html', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
         usuario = request.form['usuario']
@@ -53,7 +53,7 @@ def registro():
         # Verificar si el correo ya está registrado
         if collection.find_one({'email': email}):
             flash("El correo electrónico ya está registrado.")
-            return redirect(url_for('registro'))
+            return redirect(url_for('/templates/register.html'))
 
         # Hashear la contraseña
         hashed_password = bcrypt.generate_password_hash(contrasena).decode('utf-8')
@@ -68,9 +68,9 @@ def registro():
         session['usuario'] = usuario
         return redirect(url_for('/templates/index.html'))
 
-    return render_template('register.html')
+    return render_template('/templates/register.html')
 
-@app.route('./templates/login.html', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         usuario = request.form['usuario']
@@ -89,13 +89,12 @@ def login():
 
     return render_template('/templates/login.html')
 
-@app.route('./templates/index.html')
+@app.route('/pagina_principal')
 def pagina_principal():
     if 'usuario' not in session:
         return redirect(url_for('/templates/login.html'))
-    return render_template('index.html', usuario=session['usuario'])
-
-@app.route('./templates/mi_perfil.html')
+    return render_template('/templates/index.html', usuario=session['usuario'])
+@app.route('/mi_perfil')
 def mi_perfil():
     if 'usuario' not in session:
         return redirect(url_for('/templates/login.html'))
@@ -103,7 +102,7 @@ def mi_perfil():
     usuario = session['usuario']
     user_data = collection.find_one({'usuario': usuario})
     return render_template('/templates/mi_perfil.html', usuario=user_data['usuario'], email=user_data['email'])
-@app.route('./templates/recuperar_contrasena.html', methods=['GET', 'POST'])
+@app.route('./recuperar_contrasena', methods=['GET', 'POST'])
 def recuperar_contrasena():
     if request.method == 'POST':
         email = request.form['email']
@@ -126,7 +125,7 @@ def recuperar_contrasena():
 
     return render_template('/templates/recuperar_contrasena.html')
 
-@app.route('/templates/restablecer_contrasena/<token>', methods=['GET', 'POST'])
+@app.route('/restablecer_contrasena/<token>', methods=['GET', 'POST'])
 def restablecer_contrasena(token):
     try:
         email = serializer.loads(token, salt='password-reset-salt', max_age=3600)
