@@ -1,5 +1,5 @@
 body {
-    background-image: url('goku_perfil.jfif');
+    background-image: url('/img/fondos/goku_perfil.jfif');
     background-attachment: fixed;
     min-height: 80vh;
     background-size: cover;

@@ -1,7 +1,12 @@
-/* Global Styles */
 body {
-    background-color: lightgray; /* Fondo cambiado a lightgray */
-    color: #000; /* Texto negro para mayor contraste */
+    background-image: url('/img/fondos/fondo_login.jfif');
+    background-attachment: fixed;
+    min-height: 80vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgb(255, 131, 29); 
+    color: #000; 
     font-family: 'Roboto', sans-serif;
     display: flex;
     justify-content: center;
@@ -9,32 +14,29 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0 20px;
-    -webkit-font-smoothing: antialiased; /* Mejora la visualización en dispositivos Apple */
+    -webkit-font-smoothing: antialiased; 
 }
 
-/* Login Container */
 .login-container {
-    background: #fff; /* Fondo del contenedor cambiado a blanco */
+    background: #ffffff; 
     padding: 30px 40px;
     border-radius: 15px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); /* Sombras más suaves */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); 
     width: 100%;
     max-width: 450px;
     box-sizing: border-box;
-    border: 1px solid #000; /* Contorno negro */
     position: relative;
     transform: translateZ(0);
 }
 
-/* Form */
 .login-form h2 {
     text-align: center;
+    margin-top: 10px;
     margin-bottom: 20px;
-    font-size: 26px;
-    color: #000; /* Título en negro */
+    font-size: 30px;
+    color: #000; 
 }
 
-/* Form Fields */
 .form-group {
     position: relative;
     margin-bottom: 20px;
@@ -46,17 +48,17 @@ body {
     left: 10px;
     top: 50%;
     transform: translateY(-50%);
-    color: #000; /* Íconos en negro */
+    color: #ff7300; 
     font-size: 20px;
 }
 
 .form-group input {
     width: 100%;
     padding: 14px 14px 14px 45px;
-    border: 2px solid rgba(0, 0, 0, 0.3); /* Contorno tenue */
+    border: 2px solid rgba(255, 123, 0, 0.171); 
     border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.05); /* Fondo claro */
-    color: #000; /* Texto negro */
+    background-color: rgba(255, 196, 147, 0.158); 
+    color: #000000; 
     outline: none;
     font-size: 16px;
     transition: all 0.3s ease;
@@ -64,12 +66,12 @@ body {
 }
 
 .form-group input:focus {
-    background-color: rgba(0, 0, 0, 0.1); /* Fondo más oscuro al enfocar */
-    border-color: #000; /* Contorno negro al enfocar */
+    background-color: rgba(255, 150, 64, 0.158);
+    border: 2px solid rgba(255, 123, 0, 0.534); 
 }
 
 .form-group input::placeholder {
-    color: #666; /* Placeholder en gris oscuro */
+    color: #ff9100; 
 }
 
 /* Buttons */
@@ -78,25 +80,25 @@ body {
     padding: 14px;
     border: none;
     border-radius: 10px;
-    background: linear-gradient(45deg, #D3D3D3, #BEBEBE); /* Botón degradado claro */
-    color: #000; /* Texto negro */
+    background: linear-gradient(45deg, #f89f19, #ffab2c);  
+    color: #ffffff; /* Texto negro */
     font-size: 18px;
     font-weight: bold;
     text-transform: uppercase;
     cursor: pointer;
     transition: all 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra más tenue */
+    box-shadow: 0 4px 15px rgba(167, 167, 167, 0.1); /* Sombra más tenue */
 }
 
 .btn:hover {
-    background: linear-gradient(45deg, #BEBEBE, #D3D3D3);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(45deg, #ff8800, #ff8e32);
+    box-shadow: 0 6px 20px rgba(255, 152, 18, 0.2);
     transform: translateY(-3px);
 }
 
 .btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(163, 21, 21, 0.1);
 }
 
 /* Links */
@@ -107,22 +109,21 @@ body {
 
 .signup-link p, .login-link p {
     font-size: 14px;
-    color: #000; /* Texto en negro */
+    color: #000000; 
 }
 
 .signup-text, .login-text {
-    color: #000; /* Links en negro */
+    color: #ff9d1c; 
     font-weight: bold;
     text-decoration: none;
     transition: color 0.3s ease, transform 0.3s ease;
 }
 
 .signup-text:hover, .login-text:hover {
-    color: #444; /* Texto más oscuro al pasar el cursor */
+    color: #ff7b00; 
     transform: scale(1.1);
 }
 
-/* Password Toggle Icon */
 .toggle-password {
     position: absolute;
     right: 10px;
@@ -132,7 +133,7 @@ body {
     height: 20px;
     cursor: pointer;
     background: transparent;
-    border: 2px solid #000; /* Contorno negro */
+    border: 2px solid #ff7300;
     border-radius: 50%;
     transition: all 0.3s ease;
     box-sizing: border-box;
@@ -147,7 +148,7 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    border: 2px solid #000; /* Icono negro */
+    border: 2px solid #ff7300;
     background-color: transparent;
 }
 
@@ -159,7 +160,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) rotate(45deg);
-    background: #000; /* Líneas en negro */
+    background: #ff7300;
     opacity: 1;
 }
 
@@ -167,14 +168,13 @@ body {
     opacity: 0;
 }
 
-/* Estilo del mensaje de error */
 .error-message {
-    color: #ff4d4d; /* Rojo claro para indicar error */
+    color: #4c6baf; 
     font-size: 14px;
     text-align: center;
     margin-bottom: 15px;
-    border: 1px solid #ff4d4d;
-    background-color: rgba(255, 77, 77, 0.1);
+    border: 1px solid #c3c9e6;
+    background-color: #e9f7ef;
     padding: 10px;
     border-radius: 5px;
 }
