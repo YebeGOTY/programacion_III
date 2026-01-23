@@ -40,8 +40,8 @@ def enviar_email(destinatario, asunto, cuerpo):
 @app.route('/')
 def home():
     if 'usuario' not in session:
-        return redirect(url_for('login'))
-    return redirect(url_for('pagina_principal'))
+        return redirect(url_for('/templates/login.html'))
+    return redirect(url_for('/templates/index.html'))
 
 @app.route('./templates/register.html', methods=['GET', 'POST'])
 def registro():
@@ -66,7 +66,7 @@ def registro():
         })
         
         session['usuario'] = usuario
-        return redirect(url_for('pagina_principal'))
+        return redirect(url_for('/templates/index.html'))
 
     return render_template('register.html')
 
@@ -82,28 +82,27 @@ def login():
         # Verificar si las credenciales son correctas
         if user and bcrypt.check_password_hash(user['contrasena'], contrasena):
             session['usuario'] = usuario
-            return redirect(url_for('pagina_principal'))
+            return redirect(url_for('/templates/index.html'))
         else:
             flash("Usuario o contraseña incorrectos.")
-            return render_template('login.html')
+            return render_template('/templates/login.html')
 
-    return render_template('login.html')
+    return render_template('/templates/login.html')
 
 @app.route('./templates/index.html')
 def pagina_principal():
     if 'usuario' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('/templates/login.html'))
     return render_template('index.html', usuario=session['usuario'])
 
 @app.route('./templates/mi_perfil.html')
 def mi_perfil():
     if 'usuario' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('/templates/login.html'))
     
     usuario = session['usuario']
     user_data = collection.find_one({'usuario': usuario})
-    return render_template('mi_perfil.html', usuario=user_data['usuario'], email=user_data['email'])
-
+    return render_template('/templates/mi_perfil.html', usuario=user_data['usuario'], email=user_data['email'])
 @app.route('./templates/recuperar_contrasena.html', methods=['GET', 'POST'])
 def recuperar_contrasena():
     if request.method == 'POST':
@@ -125,29 +124,29 @@ def recuperar_contrasena():
         else:
             flash("El correo electrónico no está registrado.", "error")
 
-    return render_template('recuperar_contrasena.html')
+    return render_template('/templates/recuperar_contrasena.html')
 
-@app.route('/restablecer_contrasena/<token>', methods=['GET', 'POST'])
+@app.route('/templates/restablecer_contrasena/<token>', methods=['GET', 'POST'])
 def restablecer_contrasena(token):
     try:
         email = serializer.loads(token, salt='password-reset-salt', max_age=3600)
     except:
         flash("El enlace de restablecimiento ha caducado o es inválido.", "error")
-        return redirect(url_for('/recuperar_contrasena.html'))
+        return redirect(url_for('/templates/recuperar_contrasena.html'))
 
     if request.method == 'POST':
         nueva_contrasena = request.form['nueva_contrasena']
         hashed_password = bcrypt.generate_password_hash(nueva_contrasena).decode('utf-8')
         collection.update_one({'email': email}, {'$set': {'contrasena': hashed_password}})
         flash("Tu contraseña ha sido restablecida con éxito.", "success")
-        return redirect(url_for('login'))
+        return redirect(url_for('/templates/login.html'))
 
-    return render_template('restablecer_contrasena.html')
+    return render_template('/templates/restablecer_contrasena.html')
 
 @app.route('/logout')
 def logout():
     session.pop('usuario', None)
-    return redirect(url_for('login'))
+    return redirect(url_for('/templates/login.html'))
 
 if __name__ == '__main__':
     app.run(debug=True) 
