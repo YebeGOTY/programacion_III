@@ -51,24 +51,27 @@ body {
 
 /* Esto controla el contenedor circular */
 .dropdown .dropbtn {
-    background-color: #ffffff;
-    padding: 0; /* Quitamos el padding para que la foto llene el círculo */
-    width: 45px;  /* Ajusta este tamaño si lo quieres más grande o pequeño */
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; /* ¡ESTO ES CLAVE! Corta la imagen sobrante */
-    border: 2px solid #ffffff;
+    background-color: #ffffff !important;
+    padding: 0 !important; 
+    width: 45px !important; 
+    height: 45px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    overflow: hidden !important; /* Esto corta lo que sobra de la foto */
+    border: 2px solid #ffffff !important;
     cursor: pointer;
 }
 
 /* Esto controla la imagen dentro del botón */
 .profile-pic {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ajusta la foto al círculo sin deformarla */
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 45px !important; /* Evita que crezca más que el botón */
+    max-height: 45px !important;
+    object-fit: cover !important; /* Mantiene la proporción sin estirarse */
+    display: block !important;
 }
 
 .dropdown-content {
