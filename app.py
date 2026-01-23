@@ -43,7 +43,7 @@ def home():
         return redirect(url_for('login'))
     return redirect(url_for('pagina_principal'))
 
-@app.route('/registro', methods=['GET', 'POST'])
+@app.route('./templates/register.html', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
         usuario = request.form['usuario']
@@ -70,7 +70,7 @@ def registro():
 
     return render_template('register.html')
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('./templates/login.html', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         usuario = request.form['usuario']
@@ -89,13 +89,13 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/pagina_principal')
+@app.route('./templates/index.html')
 def pagina_principal():
     if 'usuario' not in session:
         return redirect(url_for('login'))
     return render_template('index.html', usuario=session['usuario'])
 
-@app.route('/mi_perfil')
+@app.route('./templates/mi_perfil.html')
 def mi_perfil():
     if 'usuario' not in session:
         return redirect(url_for('login'))
@@ -104,7 +104,7 @@ def mi_perfil():
     user_data = collection.find_one({'usuario': usuario})
     return render_template('mi_perfil.html', usuario=user_data['usuario'], email=user_data['email'])
 
-@app.route('/recuperar_contrasena', methods=['GET', 'POST'])
+@app.route('./templates/recuperar_contrasena.html', methods=['GET', 'POST'])
 def recuperar_contrasena():
     if request.method == 'POST':
         email = request.form['email']
@@ -133,7 +133,7 @@ def restablecer_contrasena(token):
         email = serializer.loads(token, salt='password-reset-salt', max_age=3600)
     except:
         flash("El enlace de restablecimiento ha caducado o es inválido.", "error")
-        return redirect(url_for('recuperar_contrasena'))
+        return redirect(url_for('/recuperar_contrasena.html'))
 
     if request.method == 'POST':
         nueva_contrasena = request.form['nueva_contrasena']
