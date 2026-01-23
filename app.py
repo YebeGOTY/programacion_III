@@ -41,8 +41,8 @@ def enviar_email(destinatario, asunto, cuerpo):
 @app.route('/')
 def home():
     if 'usuario' not in session:
-        return redirect(url_for('/templates/login.html'))
-    return redirect(url_for('/templates/index.html'))
+        return redirect(url_for('login')) 
+    return redirect(url_for('pagina_principal'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def registro(): 
