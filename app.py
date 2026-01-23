@@ -22,7 +22,7 @@ serializer = Serializer(app.secret_key, salt='password-reset-salt')
 
 def enviar_email(destinatario, asunto, cuerpo):
     mensaje = Mail(
-        from_email='cinenext758@gmail.com',
+        from_email='miniyebe@gmail.com',
         to_emails=destinatario,
         subject=asunto,
         html_content=cuerpo
