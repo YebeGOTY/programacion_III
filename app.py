@@ -37,7 +37,6 @@ def enviar_email(destinatario, asunto, cuerpo):
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Verificamos si hay sesión y si el rol es 'admin'
         if 'usuario' not in session or session.get('role') != 'admin':
             flash("Acceso denegado: Se requieren permisos de administrador.")
             return redirect(url_for('pagina_principal'))
