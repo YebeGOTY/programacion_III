@@ -198,8 +198,21 @@ aside {
 }
 
 .logo {
-    font-weight: 400;
+    font-weight: 700;  /* Más bold (antes era 400) */
     font-size: 1.3rem;
+}
+
+/* Agrega esto debajo de .logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo-img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
 }
 
 .menu {
