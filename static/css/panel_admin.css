@@ -1,0 +1,67 @@
+/* Contenedor principal del panel */
+.admin-table-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+/* Estilos de la tabla */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    background-color: white;
+}
+
+.admin-table th {
+    background-color: #ff7b00; /* Tu naranja característico */
+    color: white;
+    padding: 18px;
+    text-align: left;
+    font-size: 16px;
+    border: none;
+}
+
+.admin-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eeeeee;
+    color: #333333;
+    font-size: 15px;
+}
+
+.admin-table tr:hover {
+    background-color: #fff8f2;
+}
+
+/* Etiquetas de rango */
+.badge-admin {
+    color: #ff7b00;
+    font-weight: bold;
+    background: #fff0e0;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.badge-cliente {
+    color: #666666;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+/* Botón de regreso */
+.btn-volver {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #ff7b00;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+.btn-volver:hover {
+    transform: translateX(-5px);
+}

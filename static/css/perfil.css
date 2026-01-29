@@ -1,0 +1,125 @@
+/* Importar una fuente más moderna */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+body {
+    background-image: url('../img/fondos/goku_perfil.jfif');
+    background-attachment: fixed;
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ff7300; 
+}
+
+/* Efecto Glassmorphism */
+.profile-container {
+    width: 90%;
+    max-width: 450px;
+    background: rgba(255, 255, 255, 0.85); /* Fondo semi-transparente */
+    backdrop-filter: blur(10px); /* Desenfoque de lo que está atrás */
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    padding: 40px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-header h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-top: 10px;
+    letter-spacing: -0.5px;
+}
+
+.icon-circle {
+    width: 100px;
+    height: 100px;
+    background: white;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(255, 115, 0, 0.2);
+}
+
+.profile-icon {
+    font-size: 50px;  
+    color: #ff7300;  
+}
+
+.profile-info-card {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 25px 0;
+}
+
+.profile-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    text-align: left;
+}
+
+.profile-item:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.profile-item i {
+    font-size: 22px;
+    color: #ff7300;
+    margin-right: 15px;
+    width: 30px;
+    text-align: center;
+}
+
+.info-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-text label {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #888;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.info-text span {
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #ff7300;
+    color: #ffffff;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 115, 0, 0.3);
+}
+
+.btn-back:hover {
+    background-color: #e66700;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 115, 0, 0.4);
+}
