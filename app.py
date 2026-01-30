@@ -97,12 +97,6 @@ def pagina_principal():
         return redirect(url_for('login'))
     return render_template('index.html', usuario=session['usuario'])
 
-@app.route('/carrito')
-def carrito():
-    if 'usuario' not in session:
-        return redirect(url_for('login'))
-    return render_template('carrito.html', usuario=session['usuario'])
-
 @app.route('/mi_perfil')
 def mi_perfil():
     if 'usuario' not in session:
