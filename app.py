@@ -195,7 +195,6 @@ def crear_producto():
     nuevo_producto = {
         'nombre': data['nombre'],
         'precio': float(data['precio']),
-        'descripcion': data['descripcion'],
         'codigo': data['codigo'],
         'categoria': data['categoria'],
         'imagen': data.get('imagen', './img/default.jpg'),

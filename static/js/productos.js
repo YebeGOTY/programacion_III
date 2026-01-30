@@ -51,7 +51,7 @@ function configurarEventos() {
 // Cargar productos
 async function cargarProductos() {
     mostrarLoading(true);
-    
+    const response = await fetch('/api/productos');
     try {
         const response = await fetch('/api/productos');
         
