@@ -33,7 +33,6 @@ body {
     color: #000000;
 }
 
-/* ========== NAVBAR SUPERIOR ========== */
 .navbar-top {
     display: flex;
     justify-content: space-between;
@@ -178,7 +177,6 @@ body {
     background-color: #ffa6003f;
 }
 
-/* ========== WRAPPER DE TIENDA ========== */
 .wrapper {
     display: grid;
     grid-template-columns: 1fr 4fr;
@@ -190,7 +188,7 @@ aside {
     padding-right: 0;
     color: var(--clr-white);
     position: sticky;
-    top: 60px; /* Ajustado para quedar debajo del navbar */
+    top: 60px;
     height: calc(100vh - 60px);
     display: flex;
     flex-direction: column;
@@ -198,11 +196,10 @@ aside {
 }
 
 .logo {
-    font-weight: 700;  /* Más bold (antes era 400) */
+    font-weight: 700;
     font-size: 1.3rem;
 }
 
-/* Agrega esto debajo de .logo */
 .logo-container {
     display: flex;
     align-items: center;
@@ -266,7 +263,6 @@ position: relative;
     transform: scale(1.02);
 }
 
-/* Título de categorías */
 .categorias-titulo {
     display: flex;
     align-items: center;
@@ -283,7 +279,6 @@ position: relative;
     font-size: 1rem;
 }
 
-/* Contenedor de categorías */
 .categorias-container {
     display: flex;
     flex-wrap: wrap;
@@ -621,8 +616,6 @@ main {
 .disabled {
     display: none;
 }
-
-/*** MEDIA QUERIES ***/
 
 @media screen and (max-width: 850px) {
     .contenedor-productos {

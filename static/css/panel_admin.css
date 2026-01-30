@@ -1,4 +1,3 @@
-/* Contenedor principal del panel */
 .admin-table-container {
     max-width: 1100px;
     margin: 40px auto;
@@ -8,7 +7,6 @@
     box-shadow: 0 8px 30px rgba(0,0,0,0.1);
 }
 
-/* Estilos de la tabla */
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -17,7 +15,7 @@
 }
 
 .admin-table th {
-    background-color: #ff7b00; /* Tu naranja característico */
+    background-color: #ff7b00;
     color: white;
     padding: 18px;
     text-align: left;
@@ -36,7 +34,6 @@
     background-color: #fff8f2;
 }
 
-/* Etiquetas de rango */
 .badge-admin {
     color: #ff7b00;
     font-weight: bold;

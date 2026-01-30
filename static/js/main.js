@@ -212,7 +212,6 @@ function agregarAlCarrito(e) {
         const index = productosEnCarrito.findIndex(producto => producto.id === idBoton);
         productosEnCarrito[index].cantidad++;
     } else {
-        // Clonar el objeto para evitar referencias
         const productoClonado = {...productoAgregado};
         productoClonado.cantidad = 1;
         productosEnCarrito.push(productoClonado);
@@ -230,10 +229,8 @@ function actualizarNumerito() {
 const botonResetStock = document.querySelector("#reset-stock");
 if (botonResetStock) {
     botonResetStock.addEventListener("click", () => {
-        // Eliminar stock guardado
         localStorage.removeItem("stock-productos");
         
-        // Recargar productos con stock original
         fetch("../static/js/productos.json")
             .then(response => response.json())
             .then(data => {

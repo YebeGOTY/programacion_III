@@ -125,24 +125,19 @@ function actualizarTotal() {
 botonComprar.addEventListener("click", comprarCarrito);
 
 function comprarCarrito() {
-    // Actualizar stock de productos
     const stockActualizado = {};
     
-    // Cargar stock actual desde localStorage o crear objeto vacío
     const stockGuardado = localStorage.getItem("stock-productos");
     const stockData = stockGuardado ? JSON.parse(stockGuardado) : {};
     
-    // Reducir stock por cada producto comprado
     productosEnCarrito.forEach(producto => {
         const stockActual = stockData[producto.id] !== undefined ? stockData[producto.id] : producto.stock;
         stockActualizado[producto.id] = Math.max(0, stockActual - producto.cantidad);
     });
     
-    // Guardar nuevo stock
     const stockFinal = {...stockData, ...stockActualizado};
     localStorage.setItem("stock-productos", JSON.stringify(stockFinal));
     
-    // Vaciar carrito
     productosEnCarrito.length = 0;
     localStorage.setItem("productos-en-carrito", JSON.stringify(productosEnCarrito));
     

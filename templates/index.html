@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="../static/css/index.css">
 </head>
 <body>
-    <!-- Navbar superior con perfil de usuario -->
     <nav class="navbar-top">
         <div class="navbar-brand">
             <h1>Bienvenido, {{ usuario }}!</h1>
@@ -44,7 +43,6 @@
         </button>
     </nav>
     
-    <!-- Menú móvil -->
     <div class="mobile-menu hidden">
         <a href="/mi_perfil">
             <i class="fas fa-user"></i> Mi Perfil
@@ -59,7 +57,6 @@
         </a>
     </div>
 
-    <!-- Contenedor principal de la tienda -->
     <div class="wrapper">
         <header class="header-mobile">
             <h1 class="logo">Kamehouse</h1>
@@ -90,7 +87,6 @@
                     <input type="text" id="buscador" class="buscador-input" placeholder="Buscar productos...">
                 </div>
                 
-                <!-- Filtro por categorías -->
                 <div class="categorias-titulo">
                     <i class="bi bi-funnel-fill"></i>
                     <span>Filtrar por categoría</span>
@@ -135,7 +131,6 @@
         <main>
             <h2 class="titulo-principal" id="titulo-principal">Todos los productos</h2>
             <div id="contenedor-productos" class="contenedor-productos">
-                <!-- Los productos se cargarán dinámicamente con JavaScript -->
             </div>
         </main>
     </div>
@@ -144,7 +139,6 @@
     <script src="../static/js/main.js"></script>
     <script src="../static/js/menu.js"></script>
     <script>
-        // Script para el menú hamburguesa del navbar superior
         const hamburger = document.querySelector('.hamburger');
         const mobileMenu = document.querySelector('.mobile-menu');
 

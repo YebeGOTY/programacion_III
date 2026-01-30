@@ -71,7 +71,6 @@ body {
     color: #ff9100; 
 }
 
-/* Buttons */
 .btn {
     width: 100%;
     padding: 14px;
@@ -92,7 +91,6 @@ body {
     box-shadow: 0 6px 20px rgba(255, 115, 0, 0.4);
 }
 
-/* Links */
 .signup-link p, .forgot-password a {
     font-size: 14px;
     color: #444;
