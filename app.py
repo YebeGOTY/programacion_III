@@ -126,11 +126,11 @@ def mi_perfil():
     user_data = collection.find_one({'usuario': usuario})
     return render_template('mi_perfil.html', usuario=user_data['usuario'], email=user_data['email'])
 
-@app.route('/tienda')
+@app.route('/Pagina_principal')
 @login_required
 def tienda():
     """Página principal de la tienda - todos los usuarios pueden verla"""
-    return render_template('tienda.html', usuario=session['usuario'])
+    return render_template('index.html', usuario=session['usuario'])
 
 @app.route('/admin/productos')
 @admin_required

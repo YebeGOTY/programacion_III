@@ -11,7 +11,6 @@ const precioInput = document.getElementById('precio');
 const categoriaSelect = document.getElementById('categoria');
 const stockInput = document.getElementById('stock');
 const imagenInput = document.getElementById('imagen');
-const descripcionTextarea = document.getElementById('descripcion');
 const tbodyProductos = document.getElementById('tbody-productos');
 const searchAdmin = document.getElementById('search-admin');
 const btnCancelar = document.getElementById('btn-cancelar');
@@ -94,9 +93,12 @@ function crearFilaProducto(producto) {
     const tr = document.createElement('tr');
     
     const categoriaNombre = {
-        'peliculas': 'Películas',
-        'series': 'Series',
-        'libros': 'Libros'
+        'Chaquetas': 'Chaquetas',
+        'Bolsos': 'Bolsos',
+        'Manga': 'Manga',
+        'Pantalones': 'Pantalones',
+        'Accesorios': 'Accesorios',
+        'camisetas': 'Camisetas'
     }[producto.categoria] || producto.categoria;
     
     tr.innerHTML = `
@@ -137,8 +139,7 @@ async function handleSubmit(e) {
         precio: parseFloat(precioInput.value),
         categoria: categoriaSelect.value,
         stock: parseInt(stockInput.value) || 0,
-        imagen: imagenInput.value.trim() || './img/default.jpg',
-        descripcion: descripcionTextarea.value.trim()
+        imagen: imagenInput.value.trim() || './img/default.jpg'
     };
     
     // Validaciones
@@ -171,11 +172,6 @@ function validarProducto(producto) {
     
     if (producto.nombre.length < 3) {
         mostrarToast('El nombre debe tener al menos 3 caracteres', 'error');
-        return false;
-    }
-    
-    if (producto.descripcion.length < 10) {
-        mostrarToast('La descripción debe tener al menos 10 caracteres', 'error');
         return false;
     }
     
@@ -226,7 +222,6 @@ async function editarProducto(productoId) {
         categoriaSelect.value = producto.categoria;
         stockInput.value = producto.stock || 0;
         imagenInput.value = producto.imagen || '';
-        descripcionTextarea.value = producto.descripcion;
         
         // Cambiar modo a edición
         productoEditando = producto._id;
