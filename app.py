@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, redirect, url_for, session, flash
+from flask import Flask, request, render_template, redirect, url_for, session, flash, jsonify
 from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
 from sendgrid import SendGridAPIClient
@@ -7,6 +7,8 @@ from sendgrid.helpers.mail import Mail
 from itsdangerous import URLSafeTimedSerializer as Serializer
 from dotenv import load_dotenv
 from functools import wraps
+from bson import ObjectId
+import json
 
 load_dotenv()
 app = Flask(__name__)
@@ -17,6 +19,7 @@ app.secret_key = os.getenv("SECRET_KEY")
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client['db1'] 
 collection = db['usuarios'] 
+productos_collection = db['productos']
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_KEY") 
 
@@ -42,6 +45,15 @@ def admin_required(f):
         if 'usuario' not in session or session.get('role') != 'admin':
             flash("Acceso denegado: Se requieren permisos de administrador.")
             return redirect(url_for('pagina_principal'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'usuario' not in session:
+            flash("Debes iniciar sesión para acceder a esta página.")
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -113,6 +125,144 @@ def mi_perfil():
     usuario = session['usuario']
     user_data = collection.find_one({'usuario': usuario})
     return render_template('mi_perfil.html', usuario=user_data['usuario'], email=user_data['email'])
+
+@app.route('/tienda')
+@login_required
+def tienda():
+    """Página principal de la tienda - todos los usuarios pueden verla"""
+    return render_template('tienda.html', usuario=session['usuario'])
+
+@app.route('/admin/productos')
+@admin_required
+def admin_productos():
+    """Panel de administración de productos - solo admin"""
+    return render_template('agregar_productos.html', usuario=session['usuario'])
+
+@app.route('/api/productos', methods=['GET'])
+@login_required
+def obtener_productos():
+    categoria = request.args.get('categoria', None)
+    
+    if categoria and categoria != 'todos':
+        productos = list(productos_collection.find({'categoria': categoria}))
+    else:
+        productos = list(productos_collection.find())
+    
+    for producto in productos:
+        producto['_id'] = str(producto['_id'])
+    
+    return jsonify(productos)
+
+@app.route('/api/productos/buscar', methods=['GET'])
+@login_required
+def buscar_productos():
+    termino = request.args.get('q', '').strip()
+    
+    if not termino:
+        return jsonify([])
+    
+    productos = list(productos_collection.find({
+        '$or': [
+            {'codigo': {'$regex': termino, '$options': 'i'}},
+            {'nombre': {'$regex': termino, '$options': 'i'}}
+        ]
+    }))
+    
+    for producto in productos:
+        producto['_id'] = str(producto['_id'])
+    
+    return jsonify(productos)
+
+@app.route('/api/productos/<producto_id>', methods=['GET'])
+@login_required
+def obtener_producto(producto_id):
+    try:
+        producto = productos_collection.find_one({'_id': ObjectId(producto_id)})
+        if producto:
+            producto['_id'] = str(producto['_id'])
+            return jsonify(producto)
+        return jsonify({'error': 'Producto no encontrado'}), 404
+    except:
+        return jsonify({'error': 'ID inválido'}), 400
+
+@app.route('/api/productos', methods=['POST'])
+@admin_required
+def crear_producto():
+    data = request.get_json()
+    
+    # Validar datos requeridos
+    if not all(k in data for k in ['nombre', 'precio', 'descripcion', 'codigo', 'categoria']):
+        return jsonify({'error': 'Faltan campos requeridos'}), 400
+
+    if productos_collection.find_one({'codigo': data['codigo']}):
+        return jsonify({'error': 'El código ya existe'}), 400
+    
+    nuevo_producto = {
+        'nombre': data['nombre'],
+        'precio': float(data['precio']),
+        'descripcion': data['descripcion'],
+        'codigo': data['codigo'],
+        'categoria': data['categoria'],
+        'imagen': data.get('imagen', './img/default.jpg'),
+        'stock': data.get('stock', 0)
+    }
+    
+    resultado = productos_collection.insert_one(nuevo_producto)
+    nuevo_producto['_id'] = str(resultado.inserted_id)
+    
+    return jsonify(nuevo_producto), 201
+
+@app.route('/api/productos/<producto_id>', methods=['PUT'])
+@admin_required
+def actualizar_producto(producto_id):
+    try:
+        data = request.get_json()
+        
+        producto_existente = productos_collection.find_one({'_id': ObjectId(producto_id)})
+        if not producto_existente:
+            return jsonify({'error': 'Producto no encontrado'}), 404
+        
+        # Si se cambia el código, verificar que no exista otro producto con ese código
+        if 'codigo' in data and data['codigo'] != producto_existente['codigo']:
+            if productos_collection.find_one({'codigo': data['codigo']}):
+                return jsonify({'error': 'El código ya existe'}), 400
+        
+        datos_actualizados = {}
+        campos_permitidos = ['nombre', 'precio', 'descripcion', 'codigo', 'categoria', 'imagen', 'stock']
+        
+        for campo in campos_permitidos:
+            if campo in data:
+                if campo == 'precio':
+                    datos_actualizados[campo] = float(data[campo])
+                elif campo == 'stock':
+                    datos_actualizados[campo] = int(data[campo])
+                else:
+                    datos_actualizados[campo] = data[campo]
+        
+        productos_collection.update_one(
+            {'_id': ObjectId(producto_id)},
+            {'$set': datos_actualizados}
+        )
+        
+        producto_actualizado = productos_collection.find_one({'_id': ObjectId(producto_id)})
+        producto_actualizado['_id'] = str(producto_actualizado['_id'])
+        
+        return jsonify(producto_actualizado)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/api/productos/<producto_id>', methods=['DELETE'])
+@admin_required
+def eliminar_producto(producto_id):
+    try:
+        resultado = productos_collection.delete_one({'_id': ObjectId(producto_id)})
+        
+        if resultado.deleted_count == 0:
+            return jsonify({'error': 'Producto no encontrado'}), 404
+        
+        return jsonify({'mensaje': 'Producto eliminado exitosamente'})
+    except:
+        return jsonify({'error': 'ID inválido'}), 400
 
 @app.route('/recuperar_contrasena', methods=['GET', 'POST'])
 def recuperar_contrasena():
