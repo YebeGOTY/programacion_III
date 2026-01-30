@@ -44,8 +44,20 @@ header {
 .navbar-brand h1 {
     background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 1.5rem;
+}
+
+.profile-pic {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 45px !important; 
+    max-height: 45px !important;
+    object-fit: cover !important; 
+    display: block !important;
+    cursor: pointer;
+    border-radius: 50%;
 }
 
 .navbar-menu {
