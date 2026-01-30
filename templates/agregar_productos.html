@@ -16,7 +16,6 @@
             </div>
             <ul class="navbar-menu">
                 <li><a href="/pagina_principal">INICIO</a></li>
-                <li><a href="/tienda">TIENDA</a></li>
                 <li><a href="/admin/productos" class="active">ADMIN PRODUCTOS</a></li>
                 <li class="dropdown">
                     <img src="{{ url_for('static', filename='img/fondos/goku_icon.jfif') }}" alt="Foto" class="profile-pic">
@@ -58,7 +57,7 @@
                         <label for="codigo">
                             <i class="fas fa-barcode"></i> Código *
                         </label>
-                        <input type="text" id="codigo" required placeholder="Ej: PROD-001">
+                        <input type="text" id="codigo" required placeholder="Ej: 001">
                     </div>
                 </div>
 
@@ -173,7 +172,7 @@
     <div id="toast" class="toast"></div>
 
     <footer>
-        <p>&copy; 2026 CineNext - Panel de Administración</p>
+        <p>&copy; 2026 Corporation Capsule</p>
     </footer>
 
     <script src="../static/js/productos.js"></script>

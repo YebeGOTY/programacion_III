@@ -126,11 +126,6 @@ def mi_perfil():
     user_data = collection.find_one({'usuario': usuario})
     return render_template('mi_perfil.html', usuario=user_data['usuario'], email=user_data['email'])
 
-@app.route('/Pagina_principal')
-@login_required
-def tienda():
-    """Página principal de la tienda - todos los usuarios pueden verla"""
-    return render_template('index.html', usuario=session['usuario'])
 
 @app.route('/admin/productos')
 @admin_required
@@ -191,7 +186,7 @@ def crear_producto():
     data = request.get_json()
     
     # Validar datos requeridos
-    if not all(k in data for k in ['nombre', 'precio', 'descripcion', 'codigo', 'categoria']):
+    if not all(k in data for k in ['nombre', 'precio', 'codigo', 'categoria']):
         return jsonify({'error': 'Faltan campos requeridos'}), 400
 
     if productos_collection.find_one({'codigo': data['codigo']}):
