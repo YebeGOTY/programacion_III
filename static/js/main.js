@@ -1,41 +1,53 @@
+// --- VARIABLES GLOBALES ---
 let productos = [];
+let productosEnCarrito = JSON.parse(localStorage.getItem("productos-en-carrito")) || [];
+let categoriaActual = "todos";
 
-fetch("../static/js/productos.json")
-    .then(response => response.json())
-    .then(data => {
-        productos = data;
-        // Cargar stock desde localStorage si existe
-        const stockGuardado = localStorage.getItem("stock-productos");
-        if (stockGuardado) {
-            const stockData = JSON.parse(stockGuardado);
-            productos.forEach(producto => {
-                if (stockData[producto.id] !== undefined) {
-                    producto.stock = stockData[producto.id];
-                }
-            });
-        }
-        cargarProductos(productos);
-    })
-    .catch(error => {
-        console.error('Error al cargar productos:', error);
-    });
-
+// --- ELEMENTOS DEL DOM ---
 const contenedorProductos = document.querySelector("#contenedor-productos");
 const tituloPrincipal = document.querySelector("#titulo-principal");
-let botonesAgregar = document.querySelectorAll(".producto-agregar");
 const numerito = document.querySelector("#numerito");
 const buscador = document.querySelector("#buscador");
 const categoriasTags = document.querySelectorAll(".categoria-tag");
+const loading = document.querySelector("#loading");
 
-let categoriaActual = "todos";
-let textoBusqueda = "";
+// --- INICIALIZACIÓN ---
+document.addEventListener('DOMContentLoaded', () => {
+    cargarProductos();
+    actualizarNumerito();
+});
 
-// Función para cargar productos
-function cargarProductos(productosElegidos) {
+// --- LÓGICA DE DATOS ---
+
+// Obtener productos desde tu API (Base de datos)
+async function cargarProductos() {
+    mostrarLoading(true);
+    try {
+        // Si usas el backend de prueba.js
+        const url = categoriaActual === 'todos' 
+            ? '/api/productos' 
+            : `/api/productos?categoria=${categoriaActual}`;
+        
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Error al conectar con el servidor');
+        
+        productos = await response.json();
+        renderizarProductos(productos);
+    } catch (error) {
+        console.error('Error:', error);
+        // Fallback: Si la API falla, intentar cargar el JSON local por si acaso
+        intentarCargaLocal();
+    } finally {
+        mostrarLoading(false);
+    }
+}
+
+// Renderizar las tarjetas en el HTML
+function renderizarProductos(productosElegidos) {
     contenedorProductos.innerHTML = "";
 
     if (productosElegidos.length === 0) {
-        contenedorProductos.innerHTML = '<p style="color: var(--clr-main); text-align: center; padding: 2rem; grid-column: 1/-1;">No se encontraron productos.</p>';
+        contenedorProductos.innerHTML = '<p class="no-results">No se encontraron productos en esta categoría.</p>';
         return;
     }
 
@@ -47,61 +59,45 @@ function cargarProductos(productosElegidos) {
         const stockBajo = producto.stock > 0 && producto.stock <= 3;
         
         div.innerHTML = `
-            <img class="producto-imagen ${estaAgotado ? 'producto-agotado-img' : ''}" src="../static/${producto.imagen}" alt="${producto.titulo}">
+            <img class="producto-imagen ${estaAgotado ? 'producto-agotado-img' : ''}" 
+                 src="${producto.imagen}" 
+                 alt="${producto.nombre || producto.titulo}"
+                 onclick="verDetalles('${producto._id || producto.id}')">
             <div class="producto-detalles">
-                <h3 class="producto-titulo">${producto.titulo}</h3>
+                <h3 class="producto-titulo">${producto.nombre || producto.titulo}</h3>
                 <p class="producto-precio">$${producto.precio}</p>
                 <p class="producto-stock ${estaAgotado ? 'stock-agotado' : stockBajo ? 'stock-bajo' : 'stock-disponible'}">
-                    ${estaAgotado ? '¡Agotado!' : stockBajo ? `¡Solo ${producto.stock} disponibles!` : `${producto.stock} disponibles`}
+                    ${estaAgotado ? '¡Agotado!' : stockBajo ? `¡Solo ${producto.stock} uds!` : `${producto.stock} disponibles`}
                 </p>
-                <button class="producto-agregar ${estaAgotado ? 'producto-agotado' : ''}" id="${producto.id}" ${estaAgotado ? 'disabled' : ''}>
-                    ${estaAgotado ? 'Agotado' : 'Agregar'}
+                <button class="producto-agregar ${estaAgotado ? 'producto-agotado' : ''}" 
+                        id="${producto._id || producto.id}" 
+                        ${estaAgotado ? 'disabled' : ''}>
+                    ${estaAgotado ? 'Sin Stock' : 'Agregar al Carrito'}
                 </button>
             </div>
         `;
-
         contenedorProductos.append(div);
     });
 
     actualizarBotonesAgregar();
 }
 
-function filtrarProductos() {
-    let productosFiltrados = productos;
+// --- FILTROS Y BÚSQUEDA ---
 
-    // Filtrar por categoría
-    if (categoriaActual !== "todos") {
-        productosFiltrados = productosFiltrados.filter(p => p.categoria.id === categoriaActual);
-    }
-
-    if (textoBusqueda !== "") {
-        productosFiltrados = productosFiltrados.filter(p => 
-            p.titulo.toLowerCase().includes(textoBusqueda.toLowerCase()) ||
-            p.categoria.nombre.toLowerCase().includes(textoBusqueda.toLowerCase())
-        );
-    }
-
-    // Actualizar título
-    if (textoBusqueda !== "") {
-        tituloPrincipal.innerText = `Resultados para "${textoBusqueda}"`;
-    } else if (categoriaActual !== "todos") {
-        const categoriaEncontrada = productos.find(p => p.categoria.id === categoriaActual);
-        tituloPrincipal.innerText = categoriaEncontrada ? categoriaEncontrada.categoria.nombre : "Productos";
-    } else {
-        tituloPrincipal.innerText = "Todos los productos";
-    }
-
-    cargarProductos(productosFiltrados);
-}
-
-// Evento del buscador
+// Buscador en tiempo real
 if (buscador) {
     buscador.addEventListener("input", (e) => {
-        textoBusqueda = e.target.value;
-        filtrarProductos();
+        const texto = e.target.value.toLowerCase();
+        const filtrados = productos.filter(p => 
+            (p.nombre || p.titulo).toLowerCase().includes(texto) ||
+            (p.categoria.nombre || p.categoria).toLowerCase().includes(texto)
+        );
+        renderizarProductos(filtrados);
+        tituloPrincipal.innerText = texto ? `Resultados para: "${texto}"` : "Todos los productos";
     });
 }
 
+// Filtro por categorías (Sidebar)
 categoriasTags.forEach(tag => {
     tag.addEventListener("click", (e) => {
         categoriasTags.forEach(t => t.classList.remove("active"));
@@ -109,151 +105,74 @@ categoriasTags.forEach(tag => {
         
         categoriaActual = e.currentTarget.dataset.categoria;
         
-        const aside = document.querySelector("aside");
-        if (aside) {
-            aside.classList.remove("aside-visible");
-        }
+        // Cerrar menú móvil si está abierto
+        document.querySelector("aside").classList.remove("aside-visible");
         
-        filtrarProductos();
+        cargarProductos(); // Vuelve a pedir a la DB con el filtro
     });
 });
 
-function actualizarBotonesAgregar() {
-    botonesAgregar = document.querySelectorAll(".producto-agregar");
+// --- LÓGICA DEL CARRITO ---
 
+function actualizarBotonesAgregar() {
+    const botonesAgregar = document.querySelectorAll(".producto-agregar");
     botonesAgregar.forEach(boton => {
         boton.addEventListener("click", agregarAlCarrito);
     });
 }
 
-let productosEnCarrito;
-let productosEnCarritoLS = localStorage.getItem("productos-en-carrito");
-
-if (productosEnCarritoLS) {
-    productosEnCarrito = JSON.parse(productosEnCarritoLS);
-    actualizarNumerito();
-} else {
-    productosEnCarrito = [];
-}
-
 function agregarAlCarrito(e) {
-    const idBoton = e.currentTarget.id;
-    const productoAgregado = productos.find(producto => producto.id === idBoton);
+    const id = e.currentTarget.id;
+    const productoAgregado = productos.find(p => (p._id || p.id) === id);
 
-    // Verificar stock disponible
-    if (productoAgregado.stock <= 0) {
-        Toastify({
-            text: "Producto agotado",
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            style: {
-                background: "linear-gradient(to right, #c91212, #ff0000)",
-                borderRadius: "2rem",
-                textTransform: "uppercase",
-                fontSize: ".75rem"
-            },
-            offset: {
-                x: '1.5rem',
-                y: '1.5rem'
-            }
-        }).showToast();
+    // Validar stock
+    const enCarrito = productosEnCarrito.find(p => (p._id || p.id) === id);
+    if (enCarrito && enCarrito.cantidad >= productoAgregado.stock) {
+        notificar("No hay más stock disponible", "#c91212");
         return;
     }
 
-    // Verificar si ya está en el carrito
-    const productoEnCarrito = productosEnCarrito.find(p => p.id === idBoton);
-    const cantidadEnCarrito = productoEnCarrito ? productoEnCarrito.cantidad : 0;
-
-    // Verificar si hay stock suficiente
-    if (cantidadEnCarrito >= productoAgregado.stock) {
-        Toastify({
-            text: "No hay más stock disponible",
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            style: {
-                background: "linear-gradient(to right, #c91212, #ff0000)",
-                borderRadius: "2rem",
-                textTransform: "uppercase",
-                fontSize: ".75rem"
-            },
-            offset: {
-                x: '1.5rem',
-                y: '1.5rem'
-            }
-        }).showToast();
-        return;
-    }
-
-    Toastify({
-        text: "Producto agregado",
-        duration: 3000,
-        close: true,
-        gravity: "top", 
-        position: "right", 
-        stopOnFocus: true,
-        style: {
-            background: "linear-gradient(to right, #ffa620, #fc7a00)",
-            borderRadius: "2rem",
-            textTransform: "uppercase",
-            fontSize: ".75rem"
-        },
-        offset: {
-            x: '1.5rem', 
-            y: '1.5rem' 
-        },
-        onClick: function(){} 
-    }).showToast();
-
-    if(productosEnCarrito.some(producto => producto.id === idBoton)) {
-        const index = productosEnCarrito.findIndex(producto => producto.id === idBoton);
+    if (productosEnCarrito.some(p => (p._id || p.id) === id)) {
+        const index = productosEnCarrito.findIndex(p => (p._id || p.id) === id);
         productosEnCarrito[index].cantidad++;
     } else {
-        const productoClonado = {...productoAgregado};
-        productoClonado.cantidad = 1;
-        productosEnCarrito.push(productoClonado);
+        productoAgregado.cantidad = 1;
+        productosEnCarrito.push(productoAgregado);
     }
 
     actualizarNumerito();
     localStorage.setItem("productos-en-carrito", JSON.stringify(productosEnCarrito));
+    notificar("Producto añadido", "linear-gradient(to right, #ffa620, #fc7a00)");
 }
 
 function actualizarNumerito() {
-    let nuevoNumerito = productosEnCarrito.reduce((acc, producto) => acc + producto.cantidad, 0);
-    numerito.innerText = nuevoNumerito;
+    let total = productosEnCarrito.reduce((acc, p) => acc + p.cantidad, 0);
+    if (numerito) numerito.innerText = total;
 }
 
-const botonResetStock = document.querySelector("#reset-stock");
-if (botonResetStock) {
-    botonResetStock.addEventListener("click", () => {
-        localStorage.removeItem("stock-productos");
-        
-        fetch("../static/js/productos.json")
-            .then(response => response.json())
-            .then(data => {
-                productos = data;
-                cargarProductos(productos);
-                
-                Toastify({
-                    text: "Stock reiniciado correctamente",
-                    duration: 3000,
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    style: {
-                        background: "linear-gradient(to right, #ffb81d, #ff9100)",
-                        borderRadius: "2rem",
-                        textTransform: "uppercase",
-                        fontSize: ".75rem"
-                    },
-                    offset: {
-                        x: '1.5rem',
-                        y: '1.5rem'
-                    }
-                }).showToast();
-            });
-    });
+// --- UTILIDADES ---
+
+function mostrarLoading(estado) {
+    if (loading) loading.style.display = estado ? 'block' : 'none';
+    contenedorProductos.style.opacity = estado ? '0.5' : '1';
+}
+
+function notificar(texto, color) {
+    Toastify({
+        text: texto,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: { background: color, borderRadius: "2rem" }
+    }).showToast();
+}
+
+// Modal de detalles (opcional si tienes la ruta /api/productos/id)
+async function verDetalles(id) {
+    try {
+        const res = await fetch(`/api/productos/${id}`);
+        const p = await res.json();
+        // Aquí podrías disparar el modal que tenías en prueba.js
+        console.log("Detalles del producto:", p);
+    } catch (e) { console.error(e); }
 }
