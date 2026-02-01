@@ -138,11 +138,58 @@
                     <i class="fas fa-search"></i>
                     <p>No se encontraron productos</p>
                 </div>
-                    <div id="contenedor-productos" class="contenedor-productos">
+                <div id="contenedor-productos" class="contenedor-productos">
                 </div>
             </section>
-            </div>
         </main>
+    </div>
+
+    <!-- Modal de Detalles del Producto -->
+    <div class="modal-overlay" id="modal-producto">
+        <div class="modal-producto">
+            <button class="modal-close" id="modal-close">
+                <i class="bi bi-x"></i>
+            </button>
+            
+            <div class="modal-content">
+                <div class="modal-imagen-container">
+                    <span class="modal-categoria-badge" id="modal-categoria"></span>
+                    <img src="" alt="" class="modal-imagen" id="modal-imagen">
+                </div>
+                
+                <div class="modal-info">
+                    <div class="modal-header">
+                        <h2 id="modal-titulo"></h2>
+                        <p class="modal-codigo">Código: <strong id="modal-codigo"></strong></p>
+                    </div>
+                    
+                    <div class="modal-precio" id="modal-precio"></div>
+                    
+                    <div class="modal-stock-info">
+                        <i class="bi bi-box-seam" style="font-size: 1.5rem; color: var(--clr-main);"></i>
+                        <span class="modal-stock-badge" id="modal-stock"></span>
+                    </div>
+                    
+                    <div class="modal-cantidad-container">
+                        <label for="cantidad-input">Cantidad:</label>
+                        <div class="cantidad-selector">
+                            <button class="cantidad-btn" id="btn-menos">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="number" class="cantidad-input" id="cantidad-input" value="1" min="1" readonly>
+                            <button class="cantidad-btn" id="btn-mas">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button class="modal-agregar-btn" id="modal-agregar">
+                        <i class="bi bi-cart-plus-fill"></i>
+                        <span>Agregar al Carrito</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
