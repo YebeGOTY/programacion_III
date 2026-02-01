@@ -75,11 +75,11 @@
                         </label>
                         <select id="categoria" required>
                             <option value="">Seleccionar...</option>
-                            <option value="Chaquetas">Chaquetas</option>
-                            <option value="Bolsos">Bolsos</option>
-                            <option value="Manga">Manga</option>
-                            <option value="Pantalones">Pantalones</option>
-                            <option value="Accesorios">Accesorios</option>
+                            <option value="chaquetas">Chaquetas</option>
+                            <option value="bolsos">Bolsos</option>
+                            <option value="manga">Manga</option>
+                            <option value="pantalones">Pantalones</option>
+                            <option value="accesorios">Accesorios</option>
                             <option value="camisetas">Camisetas</option>
                         </select>
                     </div>
@@ -116,9 +116,14 @@
         <section class="lista-section">
             <div class="lista-header">
                 <h2><i class="fas fa-box-open"></i> Productos Registrados</h2>
-                <div class="search-container">
-                    <input type="text" id="search-admin" placeholder="Buscar productos...">
-                    <i class="fas fa-search"></i>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button type="button" class="btn btn-info" id="btn-restablecer-stock" title="Restablecer stock de todos los productos">
+                        <i class="fas fa-sync-alt"></i> Restablecer Stock
+                    </button>
+                    <div class="search-container">
+                        <input type="text" id="search-admin" placeholder="Buscar productos...">
+                        <i class="fas fa-search"></i>
+                    </div>
                 </div>
             </div>
 
@@ -175,6 +180,8 @@
         <p>&copy; 2026 Corporation Capsule</p>
     </footer>
 
+    <!-- SweetAlert2 para el modal de restablecer stock -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../static/js/productos.js"></script>
 </body>
 </html>

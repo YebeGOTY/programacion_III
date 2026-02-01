@@ -22,11 +22,15 @@ function cargarProductosCarrito() {
         productosEnCarrito.forEach(producto => {
             const div = document.createElement("div");
             div.classList.add("carrito-producto");
+            
+            // Usar _id o id según lo que tenga el producto
+            const productoId = producto._id || producto.id;
+            
             div.innerHTML = `
-                <img class="carrito-producto-imagen" src="../static/${producto.imagen.replace('./', '')}" alt="${producto.titulo}">
+                <img class="carrito-producto-imagen" src="../static/${producto.imagen.replace('./', '')}" alt="${producto.titulo || producto.nombre}">
                 <div class="carrito-producto-titulo">
                     <small>Título</small>
-                    <h3>${producto.titulo}</h3>
+                    <h3>${producto.titulo || producto.nombre}</h3>
                 </div>
                 <div class="carrito-producto-cantidad">
                     <small>Cantidad</small>
@@ -40,7 +44,7 @@ function cargarProductosCarrito() {
                     <small>Subtotal</small>
                     <p>$${producto.precio * producto.cantidad}</p>
                 </div>
-                <button class="carrito-producto-eliminar" id="${producto.id}"><i class="bi bi-trash-fill"></i></button>
+                <button class="carrito-producto-eliminar" id="${productoId}"><i class="bi bi-trash-fill"></i></button>
             `;
     
             contenedorCarritoProductos.append(div);
@@ -89,7 +93,7 @@ function eliminarDelCarrito(e) {
     }).showToast();
 
     const idBoton = e.currentTarget.id;
-    const index = productosEnCarrito.findIndex(producto => producto.id === idBoton);
+    const index = productosEnCarrito.findIndex(producto => (producto._id || producto.id) === idBoton);
     
     productosEnCarrito.splice(index, 1);
     cargarProductosCarrito();
@@ -124,25 +128,67 @@ function actualizarTotal() {
 
 botonComprar.addEventListener("click", comprarCarrito);
 
-function comprarCarrito() {
-    const stockActualizado = {};
-    
-    const stockGuardado = localStorage.getItem("stock-productos");
-    const stockData = stockGuardado ? JSON.parse(stockGuardado) : {};
-    
-    productosEnCarrito.forEach(producto => {
-        const stockActual = stockData[producto.id] !== undefined ? stockData[producto.id] : producto.stock;
-        stockActualizado[producto.id] = Math.max(0, stockActual - producto.cantidad);
-    });
-    
-    const stockFinal = {...stockData, ...stockActualizado};
-    localStorage.setItem("stock-productos", JSON.stringify(stockFinal));
-    
-    productosEnCarrito.length = 0;
-    localStorage.setItem("productos-en-carrito", JSON.stringify(productosEnCarrito));
-    
-    contenedorCarritoVacio.classList.add("disabled");
-    contenedorCarritoProductos.classList.add("disabled");
-    contenedorCarritoAcciones.classList.add("disabled");
-    contenedorCarritoComprado.classList.remove("disabled");
+async function comprarCarrito() {
+    try {
+        // Mostrar loading
+        botonComprar.disabled = true;
+        botonComprar.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+        
+        // Enviar productos al backend para actualizar stock
+        const response = await fetch('/api/procesar-compra', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productos: productosEnCarrito
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Error al procesar la compra');
+        }
+        
+        // Si todo salió bien, vaciar carrito
+        productosEnCarrito.length = 0;
+        localStorage.setItem("productos-en-carrito", JSON.stringify(productosEnCarrito));
+        
+        // Mostrar mensaje de éxito
+        contenedorCarritoVacio.classList.add("disabled");
+        contenedorCarritoProductos.classList.add("disabled");
+        contenedorCarritoAcciones.classList.add("disabled");
+        contenedorCarritoComprado.classList.remove("disabled");
+        
+        // Mostrar notificación
+        Toastify({
+            text: "¡Compra realizada exitosamente!",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                borderRadius: "2rem"
+            }
+        }).showToast();
+        
+    } catch (error) {
+        console.error('Error:', error);
+        
+        Toastify({
+            text: error.message || "Error al procesar la compra",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: {
+                background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                borderRadius: "2rem"
+            }
+        }).showToast();
+        
+        // Restaurar botón
+        botonComprar.disabled = false;
+        botonComprar.innerHTML = 'Comprar ahora';
+    }
 }

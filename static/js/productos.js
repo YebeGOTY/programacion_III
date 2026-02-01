@@ -20,6 +20,7 @@ const formTitle = document.getElementById('form-title');
 const loadingProductos = document.getElementById('loading-productos');
 const noProductos = document.getElementById('no-productos');
 const tablaContainer = document.getElementById('tabla-productos-container');
+const btnRestablecerStock = document.getElementById('btn-restablecer-stock');
 
 // Modal
 const modal = document.getElementById('modal-confirmacion');
@@ -40,6 +41,10 @@ function configurarEventos() {
     searchAdmin.addEventListener('input', filtrarProductos);
     btnCancelarModal.addEventListener('click', cerrarModal);
     
+    if (btnRestablecerStock) {
+        btnRestablecerStock.addEventListener('click', restablecerStockTodos);
+    }
+    
     // Cerrar modal al hacer clic fuera
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -51,7 +56,6 @@ function configurarEventos() {
 // Cargar productos
 async function cargarProductos() {
     mostrarLoading(true);
-    const response = await fetch('/api/productos');
     try {
         const response = await fetch('/api/productos');
         
@@ -93,19 +97,19 @@ function crearFilaProducto(producto) {
     const tr = document.createElement('tr');
     
     const categoriaNombre = {
-        'Chaquetas': 'Chaquetas',
-        'Bolsos': 'Bolsos',
-        'Manga': 'Manga',
-        'Pantalones': 'Pantalones',
-        'Accesorios': 'Accesorios',
+        'chaquetas': 'Chaquetas',
+        'bolsos': 'Bolsos',
+        'manga': 'Manga',
+        'pantalones': 'Pantalones',
+        'accesorios': 'Accesorios',
         'camisetas': 'Camisetas'
-    }[producto.categoria] || producto.categoria;
+    }[producto.categoria.toLowerCase()] || producto.categoria;
     
     tr.innerHTML = `
         <td><strong>${producto.codigo}</strong></td>
         <td>${producto.nombre}</td>
         <td>
-            <span class="categoria-badge categoria-${producto.categoria}">
+            <span class="categoria-badge categoria-${producto.categoria.toLowerCase()}">
                 ${categoriaNombre}
             </span>
         </td>
@@ -292,6 +296,54 @@ async function eliminarProducto(productoId) {
     } catch (error) {
         mostrarToast(error.message, 'error');
         cerrarModal();
+    }
+}
+
+// NUEVA FUNCIÓN: Restablecer stock de todos los productos
+async function restablecerStockTodos() {
+    const { value: stockDefault } = await Swal.fire({
+        title: 'Restablecer Stock',
+        text: '¿A cuántas unidades deseas restablecer el stock de todos los productos?',
+        input: 'number',
+        inputValue: 10,
+        showCancelButton: true,
+        confirmButtonText: 'Restablecer',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value || value < 0) {
+                return 'Debes ingresar un número válido';
+            }
+        }
+    });
+
+    if (stockDefault) {
+        try {
+            btnRestablecerStock.disabled = true;
+            btnRestablecerStock.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+            
+            const response = await fetch('/api/productos/restablecer-stock', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ stock_default: parseInt(stockDefault) })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Error al restablecer stock');
+            }
+            
+            mostrarToast(`Stock restablecido a ${stockDefault} unidades`, 'success');
+            cargarProductos();
+            
+        } catch (error) {
+            mostrarToast(error.message, 'error');
+        } finally {
+            btnRestablecerStock.disabled = false;
+            btnRestablecerStock.innerHTML = '<i class="fas fa-sync-alt"></i> Restablecer Stock';
+        }
     }
 }
 

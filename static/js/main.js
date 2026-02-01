@@ -1,9 +1,7 @@
-// --- VARIABLES GLOBALES ---
 let productos = [];
 let productosEnCarrito = JSON.parse(localStorage.getItem("productos-en-carrito")) || [];
 let categoriaActual = "todos";
 
-// --- ELEMENTOS DEL DOM ---
 const contenedorProductos = document.querySelector("#contenedor-productos");
 const tituloPrincipal = document.querySelector("#titulo-principal");
 const numerito = document.querySelector("#numerito");
@@ -11,19 +9,14 @@ const buscador = document.querySelector("#buscador");
 const categoriasTags = document.querySelectorAll(".categoria-tag");
 const loading = document.querySelector("#loading");
 
-// --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
     cargarProductos();
     actualizarNumerito();
 });
 
-// --- LÓGICA DE DATOS ---
-
-// Obtener productos desde tu API (Base de datos)
 async function cargarProductos() {
     mostrarLoading(true);
     try {
-        // Si usas el backend de prueba.js
         const url = categoriaActual === 'todos' 
             ? '/api/productos' 
             : `/api/productos?categoria=${categoriaActual}`;
@@ -32,17 +25,24 @@ async function cargarProductos() {
         if (!response.ok) throw new Error('Error al conectar con el servidor');
         
         productos = await response.json();
+        
+        // Actualizar título según categoría
+        if (categoriaActual === 'todos') {
+            tituloPrincipal.innerText = 'Todos los productos';
+        } else {
+            const nombreCategoria = categoriaActual.charAt(0).toUpperCase() + categoriaActual.slice(1);
+            tituloPrincipal.innerText = nombreCategoria;
+        }
+        
         renderizarProductos(productos);
     } catch (error) {
         console.error('Error:', error);
-        // Fallback: Si la API falla, intentar cargar el JSON local por si acaso
-        intentarCargaLocal();
+        contenedorProductos.innerHTML = '<p class="no-results">Error al cargar productos. Por favor, intenta de nuevo.</p>';
     } finally {
         mostrarLoading(false);
     }
 }
 
-// Renderizar las tarjetas en el HTML
 function renderizarProductos(productosElegidos) {
     contenedorProductos.innerHTML = "";
 
@@ -60,9 +60,9 @@ function renderizarProductos(productosElegidos) {
         
         div.innerHTML = `
             <img class="producto-imagen ${estaAgotado ? 'producto-agotado-img' : ''}" 
-                 src="${producto.imagen}" 
-                 alt="${producto.nombre || producto.titulo}"
-                 onclick="verDetalles('${producto._id || producto.id}')">
+                src="${producto.imagen}" 
+                alt="${producto.nombre || producto.titulo}"
+                onclick="verDetalles('${producto._id || producto.id}')">
             <div class="producto-detalles">
                 <h3 class="producto-titulo">${producto.nombre || producto.titulo}</h3>
                 <p class="producto-precio">$${producto.precio}</p>
@@ -82,37 +82,37 @@ function renderizarProductos(productosElegidos) {
     actualizarBotonesAgregar();
 }
 
-// --- FILTROS Y BÚSQUEDA ---
-
-// Buscador en tiempo real
 if (buscador) {
     buscador.addEventListener("input", (e) => {
         const texto = e.target.value.toLowerCase();
         const filtrados = productos.filter(p => 
             (p.nombre || p.titulo).toLowerCase().includes(texto) ||
-            (p.categoria.nombre || p.categoria).toLowerCase().includes(texto)
+            (p.categoria || '').toLowerCase().includes(texto)
         );
         renderizarProductos(filtrados);
-        tituloPrincipal.innerText = texto ? `Resultados para: "${texto}"` : "Todos los productos";
+        tituloPrincipal.innerText = texto ? `Resultados para: "${texto}"` : 
+            (categoriaActual === 'todos' ? 'Todos los productos' : categoriaActual.charAt(0).toUpperCase() + categoriaActual.slice(1));
     });
 }
 
-// Filtro por categorías (Sidebar)
 categoriasTags.forEach(tag => {
     tag.addEventListener("click", (e) => {
         categoriasTags.forEach(t => t.classList.remove("active"));
         e.currentTarget.classList.add("active");
         
-        categoriaActual = e.currentTarget.dataset.categoria;
-        
-        // Cerrar menú móvil si está abierto
+        categoriaActual = e.currentTarget.dataset.categoria.toLowerCase();
+
+        // Cerrar menú lateral en móvil
         document.querySelector("aside").classList.remove("aside-visible");
         
-        cargarProductos(); // Vuelve a pedir a la DB con el filtro
+        // Limpiar buscador
+        if (buscador) {
+            buscador.value = '';
+        }
+        
+        cargarProductos(); 
     });
 });
-
-// --- LÓGICA DEL CARRITO ---
 
 function actualizarBotonesAgregar() {
     const botonesAgregar = document.querySelectorAll(".producto-agregar");
@@ -125,7 +125,11 @@ function agregarAlCarrito(e) {
     const id = e.currentTarget.id;
     const productoAgregado = productos.find(p => (p._id || p.id) === id);
 
-    // Validar stock
+    if (!productoAgregado) {
+        notificar("Error: Producto no encontrado", "#c91212");
+        return;
+    }
+
     const enCarrito = productosEnCarrito.find(p => (p._id || p.id) === id);
     if (enCarrito && enCarrito.cantidad >= productoAgregado.stock) {
         notificar("No hay más stock disponible", "#c91212");
@@ -150,8 +154,6 @@ function actualizarNumerito() {
     if (numerito) numerito.innerText = total;
 }
 
-// --- UTILIDADES ---
-
 function mostrarLoading(estado) {
     if (loading) loading.style.display = estado ? 'block' : 'none';
     contenedorProductos.style.opacity = estado ? '0.5' : '1';
@@ -167,12 +169,10 @@ function notificar(texto, color) {
     }).showToast();
 }
 
-// Modal de detalles (opcional si tienes la ruta /api/productos/id)
 async function verDetalles(id) {
     try {
         const res = await fetch(`/api/productos/${id}`);
         const p = await res.json();
-        // Aquí podrías disparar el modal que tenías en prueba.js
         console.log("Detalles del producto:", p);
     } catch (e) { console.error(e); }
 }

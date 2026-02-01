@@ -20,6 +20,7 @@ client = MongoClient(os.getenv("MONGO_URI"))
 db = client['db1'] 
 collection = db['usuarios'] 
 productos_collection = db['productos']
+carritos_collection = db['carritos']
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_KEY") 
 
@@ -139,7 +140,8 @@ def obtener_productos():
     categoria = request.args.get('categoria', None)
     
     if categoria and categoria != 'todos':
-        productos = list(productos_collection.find({'categoria': categoria}))
+        # Búsqueda case-insensitive
+        productos = list(productos_collection.find({'categoria': {'$regex': f'^{categoria}$', '$options': 'i'}}))
     else:
         productos = list(productos_collection.find())
     
@@ -257,6 +259,72 @@ def eliminar_producto(producto_id):
         return jsonify({'mensaje': 'Producto eliminado exitosamente'})
     except:
         return jsonify({'error': 'ID inválido'}), 400
+
+# NUEVO ENDPOINT PARA PROCESAR COMPRA Y ACTUALIZAR STOCK
+@app.route('/api/procesar-compra', methods=['POST'])
+@login_required
+def procesar_compra():
+    try:
+        data = request.get_json()
+        productos_comprados = data.get('productos', [])
+        
+        if not productos_comprados:
+            return jsonify({'error': 'No hay productos en el carrito'}), 400
+        
+        # Verificar stock disponible antes de procesar
+        for item in productos_comprados:
+            producto_id = item.get('_id') or item.get('id')
+            cantidad = item.get('cantidad', 0)
+            
+            producto = productos_collection.find_one({'_id': ObjectId(producto_id)})
+            if not producto:
+                return jsonify({'error': f'Producto {producto_id} no encontrado'}), 404
+            
+            if producto['stock'] < cantidad:
+                return jsonify({
+                    'error': f'Stock insuficiente para {producto["nombre"]}. Disponible: {producto["stock"]}, Solicitado: {cantidad}'
+                }), 400
+        
+        # Actualizar stock de cada producto
+        for item in productos_comprados:
+            producto_id = item.get('_id') or item.get('id')
+            cantidad = item.get('cantidad', 0)
+            
+            productos_collection.update_one(
+                {'_id': ObjectId(producto_id)},
+                {'$inc': {'stock': -cantidad}}
+            )
+        
+        return jsonify({
+            'mensaje': 'Compra procesada exitosamente',
+            'productos_actualizados': len(productos_comprados)
+        }), 200
+        
+    except Exception as e:
+        print(f"Error al procesar compra: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# NUEVO ENDPOINT PARA RESTABLECER STOCK DE TODOS LOS PRODUCTOS
+@app.route('/api/productos/restablecer-stock', methods=['POST'])
+@admin_required
+def restablecer_stock():
+    try:
+        data = request.get_json()
+        stock_default = data.get('stock_default', 10)
+        
+        # Actualizar todos los productos
+        resultado = productos_collection.update_many(
+            {},
+            {'$set': {'stock': stock_default}}
+        )
+        
+        return jsonify({
+            'mensaje': f'Stock restablecido a {stock_default} unidades',
+            'productos_actualizados': resultado.modified_count
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/recuperar_contrasena', methods=['GET', 'POST'])
 def recuperar_contrasena():
