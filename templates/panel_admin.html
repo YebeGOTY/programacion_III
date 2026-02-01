@@ -83,7 +83,11 @@
                             {% endif %}
                         </td>
                         <td class="acciones-td">
-                            <button class="btn-action btn-edit" oonclick="editarRol('{{ u._id }}', '{{ u.usuario }}', '{{ u.role }}')" title="Cambiar rol">
+                            <button class="btn-action btn-edit" 
+                                    data-usuario-id="{{ u._id }}" 
+                                    data-usuario-nombre="{{ u.usuario }}" 
+                                    data-usuario-rol="{{ u.get('role', 'cliente') }}"
+                                    onclick="editarRol(this.dataset.usuarioId, this.dataset.usuarioNombre, this.dataset.usuarioRol)">
                                 <i class="fas fa-user-edit"></i>
                             </button>
                             <button class="btn-action btn-delete" onclick="confirmarEliminar('{{ u._id }}', '{{ u.usuario }}')" title="Eliminar usuario">

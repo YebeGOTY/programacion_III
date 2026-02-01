@@ -12,9 +12,12 @@ const selectRol = document.getElementById('select-rol');
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Panel de administración cargado');
+    
     // Guardar usuarios originales para búsqueda
     const filas = usuariosTbody.querySelectorAll('tr');
     usuariosOriginales = Array.from(filas);
+    console.log(`Total usuarios cargados: ${usuariosOriginales.length}`);
     
     // Configurar búsqueda
     if (searchInput) {
@@ -59,6 +62,8 @@ function filtrarUsuarios() {
 
 // Abrir modal para editar rol
 function editarRol(usuarioId, nombreUsuario, rolActual) {
+    console.log('Editando rol:', { usuarioId, nombreUsuario, rolActual });
+    
     usuarioIdActual = usuarioId;
     
     document.getElementById('modal-usuario-nombre').textContent = nombreUsuario;
@@ -77,9 +82,13 @@ function cerrarModalRol() {
 
 // Guardar cambio de rol
 async function guardarRol() {
-    if (!usuarioIdActual) return;
+    if (!usuarioIdActual) {
+        console.error('No hay usuario seleccionado');
+        return;
+    }
     
     const nuevoRol = selectRol.value;
+    console.log('Guardando rol:', { usuarioIdActual, nuevoRol });
     
     try {
         const response = await fetch(`/api/usuarios/${usuarioIdActual}/rol`, {
@@ -90,7 +99,9 @@ async function guardarRol() {
             body: JSON.stringify({ role: nuevoRol })
         });
         
+        console.log('Respuesta del servidor:', response.status);
         const data = await response.json();
+        console.log('Datos recibidos:', data);
         
         if (!response.ok) {
             throw new Error(data.error || 'Error al actualizar rol');
@@ -105,13 +116,15 @@ async function guardarRol() {
         }, 1000);
         
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error al guardar rol:', error);
         mostrarToast(error.message, 'error');
     }
 }
 
 // Abrir modal para confirmar eliminación
 function confirmarEliminar(usuarioId, nombreUsuario) {
+    console.log('Confirmando eliminación:', { usuarioId, nombreUsuario });
+    
     usuarioIdActual = usuarioId;
     
     document.getElementById('modal-usuario-eliminar').textContent = nombreUsuario;
@@ -129,14 +142,21 @@ function cerrarModalEliminar() {
 
 // Eliminar usuario
 async function eliminarUsuario() {
-    if (!usuarioIdActual) return;
+    if (!usuarioIdActual) {
+        console.error('No hay usuario seleccionado para eliminar');
+        return;
+    }
+    
+    console.log('Eliminando usuario:', usuarioIdActual);
     
     try {
         const response = await fetch(`/api/usuarios/${usuarioIdActual}`, {
             method: 'DELETE'
         });
         
+        console.log('Respuesta del servidor:', response.status);
         const data = await response.json();
+        console.log('Datos recibidos:', data);
         
         if (!response.ok) {
             throw new Error(data.error || 'Error al eliminar usuario');
@@ -160,7 +180,7 @@ async function eliminarUsuario() {
         }
         
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error al eliminar usuario:', error);
         mostrarToast(error.message, 'error');
     }
 }
@@ -180,6 +200,8 @@ function actualizarEstadisticas() {
     if (totalUsuariosEl) totalUsuariosEl.textContent = totalUsuarios;
     if (totalAdminsEl) totalAdminsEl.textContent = totalAdmins;
     if (totalClientesEl) totalClientesEl.textContent = totalClientes;
+    
+    console.log('Estadísticas actualizadas:', { totalUsuarios, totalAdmins, totalClientes });
 }
 
 // Mostrar toast de notificación
@@ -213,14 +235,18 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Cerrar modales al hacer clic fuera
-modalEditarRol.addEventListener('click', (e) => {
-    if (e.target === modalEditarRol) {
-        cerrarModalRol();
-    }
-});
+if (modalEditarRol) {
+    modalEditarRol.addEventListener('click', (e) => {
+        if (e.target === modalEditarRol) {
+            cerrarModalRol();
+        }
+    });
+}
 
-modalEliminar.addEventListener('click', (e) => {
-    if (e.target === modalEliminar) {
-        cerrarModalEliminar();
-    }
-});
+if (modalEliminar) {
+    modalEliminar.addEventListener('click', (e) => {
+        if (e.target === modalEliminar) {
+            cerrarModalEliminar();
+        }
+    });
+}
