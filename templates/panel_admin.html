@@ -30,6 +30,35 @@
             <div class="welcome-text">
                 <h2 class="titulo-principal">Gestión de Usuarios</h2>
                 <p>Lista oficial de guerreros registrados en la base de datos de Kamehouse.</p>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div>
+                            <h3 id="total-usuarios">{{ usuarios|length }}</h3>
+                            <p>Total Usuarios</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user-shield"></i>
+                        <div>
+                            <h3 id="total-admins">{{ usuarios|selectattr('role', 'equalto', 'admin')|list|length }}</h3>
+                            <p>Administradores</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user"></i>
+                        <div>
+                            <h3 id="total-clientes">{{ usuarios|length - usuarios|selectattr('role', 'equalto', 'admin')|list|length }}</h3>
+                            <p>Clientes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buscador -->
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-usuarios" placeholder="Buscar por usuario o email...">
             </div>
 
             <table class="admin-table">
@@ -38,11 +67,12 @@
                         <th><i class="fas fa-user"></i> Usuario</th>
                         <th><i class="fas fa-envelope"></i> Email</th>
                         <th><i class="fas fa-shield-alt"></i> Rango</th>
+                        <th><i class="fas fa-cog"></i> Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="usuarios-tbody">
                     {% for u in usuarios %}
-                    <tr>
+                    <tr data-usuario-id="{{ u._id }}">
                         <td><strong>{{ u.usuario }}</strong></td>
                         <td>{{ u.email }}</td>
                         <td>
@@ -52,15 +82,87 @@
                                 <span class="badge-cliente">Cliente</span>
                             {% endif %}
                         </td>
+                        <td class="acciones-td">
+                            <button class="btn-action btn-edit" oonclick="editarRol('{{ u._id }}', '{{ u.usuario }}', '{{ u.role }}')" title="Cambiar rol">
+                                <i class="fas fa-user-edit"></i>
+                            </button>
+                            <button class="btn-action btn-delete" onclick="confirmarEliminar('{{ u._id }}', '{{ u.usuario }}')" title="Eliminar usuario">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+
+            <div id="no-results" class="no-results" style="display: none;">
+                <i class="fas fa-search"></i>
+                <p>No se encontraron usuarios</p>
+            </div>
         </div>
     </main>
+
+    <!-- Modal para editar rol -->
+    <div id="modal-editar-rol" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-edit"></i> Cambiar Rol de Usuario</h3>
+                <button class="modal-close" onclick="cerrarModalRol()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Usuario: <strong id="modal-usuario-nombre"></strong></p>
+                <div class="form-group">
+                    <label for="select-rol">Nuevo Rol:</label>
+                    <select id="select-rol" class="select-rol">
+                        <option value="cliente">Cliente</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModalRol()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarRol()">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para confirmar eliminación -->
+    <div id="modal-eliminar" class="modal">
+        <div class="modal-content modal-danger">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+                <button class="modal-close" onclick="cerrarModalEliminar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar al usuario?</p>
+                <p class="usuario-eliminar"><strong id="modal-usuario-eliminar"></strong></p>
+                <p class="warning-text">
+                    <i class="fas fa-info-circle"></i>
+                    Esta acción no se puede deshacer.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModalEliminar()">Cancelar</button>
+                <button class="btn btn-danger" onclick="eliminarUsuario()">
+                    <i class="fas fa-trash-alt"></i> Eliminar Usuario
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de notificaciones -->
+    <div id="toast" class="toast"></div>
 
     <footer style="text-align: center; padding: 20px;">
         <p class="texto-footer">&copy; 2026 Kamehouse. Panel de Administración Privado.</p>
     </footer>
+
+    <script src="../static/js/panel_admin.js"></script>
 </body>
 </html>

@@ -366,6 +366,65 @@ def restablecer_contrasena(token):
 
     return render_template('restablecer_contrasena.html')
 
+@app.route('/api/usuarios/<usuario_id>/rol', methods=['PUT'])
+@admin_required
+def actualizar_rol_usuario(usuario_id):
+    """Actualizar el rol de un usuario"""
+    try:
+        data = request.get_json()
+        nuevo_rol = data.get('role')
+        
+        if nuevo_rol not in ['admin', 'cliente']:
+            return jsonify({'error': 'Rol inválido'}), 400
+        
+        # Verificar que el usuario existe
+        usuario = collection.find_one({'_id': ObjectId(usuario_id)})
+        if not usuario:
+            return jsonify({'error': 'Usuario no encontrado'}), 404
+        
+        # Actualizar rol
+        collection.update_one(
+            {'_id': ObjectId(usuario_id)},
+            {'$set': {'role': nuevo_rol}}
+        )
+        
+        return jsonify({
+            'mensaje': 'Rol actualizado exitosamente',
+            'usuario_id': usuario_id,
+            'nuevo_rol': nuevo_rol
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/usuarios/<usuario_id>', methods=['DELETE'])
+@admin_required
+def eliminar_usuario(usuario_id):
+    """Eliminar un usuario"""
+    try:
+        # Verificar que el usuario existe
+        usuario = collection.find_one({'_id': ObjectId(usuario_id)})
+        if not usuario:
+            return jsonify({'error': 'Usuario no encontrado'}), 404
+        
+        # Evitar que un admin se elimine a sí mismo
+        if usuario['usuario'] == session.get('usuario'):
+            return jsonify({'error': 'No puedes eliminar tu propia cuenta'}), 400
+        
+        # Eliminar usuario
+        resultado = collection.delete_one({'_id': ObjectId(usuario_id)})
+        
+        if resultado.deleted_count == 0:
+            return jsonify({'error': 'No se pudo eliminar el usuario'}), 500
+        
+        return jsonify({
+            'mensaje': 'Usuario eliminado exitosamente',
+            'usuario_eliminado': usuario['usuario']
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/admin')
 @admin_required
 def panel_admin():

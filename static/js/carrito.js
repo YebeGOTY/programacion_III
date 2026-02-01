@@ -27,7 +27,7 @@ function cargarProductosCarrito() {
             const productoId = producto._id || producto.id;
             
             div.innerHTML = `
-                <img class="carrito-producto-imagen" src="../static/${producto.imagen.replace('./', '')}" alt="${producto.titulo || producto.nombre}">
+                <img class="carrito-producto-imagen" src="/${producto.imagen.replace('./', '')}" alt="${producto.titulo || producto.nombre}">
                 <div class="carrito-producto-titulo">
                     <small>Título</small>
                     <h3>${producto.titulo || producto.nombre}</h3>
