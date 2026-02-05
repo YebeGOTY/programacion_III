@@ -24,7 +24,6 @@ function cargarProductosCarrito() {
             div.classList.add("carrito-producto");
             const productoId = producto._id || producto.id;
             
-            // Arreglar ruta de imagen
             let rutaImagen = producto.imagen;
             if (rutaImagen.startsWith('./')) {
                 rutaImagen = '../static/' + rutaImagen.substring(2);
@@ -136,11 +135,9 @@ botonComprar.addEventListener("click", comprarCarrito);
 
 async function comprarCarrito() {
     try {
-        // Mostrar loading
         botonComprar.disabled = true;
         botonComprar.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
         
-        // Enviar productos al backend para actualizar stock
         const response = await fetch('/api/procesar-compra', {
             method: 'POST',
             headers: {
@@ -157,14 +154,11 @@ async function comprarCarrito() {
             throw new Error(data.error || 'Error al procesar la compra');
         }
         
-        // Generar factura antes de vaciar el carrito
         mostrarFactura(productosEnCarrito);
         
-        // Si todo salió bien, vaciar carrito
         productosEnCarrito.length = 0;
         localStorage.setItem("productos-en-carrito", JSON.stringify(productosEnCarrito));
         
-        // Mostrar mensaje de éxito
         contenedorCarritoVacio.classList.add("disabled");
         contenedorCarritoProductos.classList.add("disabled");
         contenedorCarritoAcciones.classList.add("disabled");
@@ -184,19 +178,16 @@ async function comprarCarrito() {
             }
         }).showToast();
         
-        // Restaurar botón
         botonComprar.disabled = false;
         botonComprar.innerHTML = 'Comprar ahora';
     }
 }
 
 function mostrarFactura(productos) {
-    // Calcular totales
     const subtotal = productos.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
-    const iva = subtotal * 0.16; // 16% de IVA
+    const iva = subtotal * 0.16; 
     const total = subtotal + iva;
     
-    // Generar número de factura
     const numeroFactura = 'FAC-' + Date.now().toString().slice(-8);
     const fecha = new Date().toLocaleDateString('es-ES', {
         year: 'numeric',
@@ -206,7 +197,6 @@ function mostrarFactura(productos) {
         minute: '2-digit'
     });
     
-    // Crear HTML de los productos
     let productosHTML = '';
     productos.forEach(p => {
         productosHTML += `
@@ -301,7 +291,6 @@ function mostrarFactura(productos) {
 }
 
 function descargarFactura(productos, numeroFactura, fecha, subtotal, iva, total) {
-    // Crear contenido de la factura en formato texto
     let contenido = `
 ╔════════════════════════════════════════╗
 ║          🏠 KAMEHOUSE                  ║
@@ -315,7 +304,7 @@ function descargarFactura(productos, numeroFactura, fecha, subtotal, iva, total)
 
 📋 Factura N°: ${numeroFactura}
 📅 Fecha: ${fecha}
-👤 Cliente: Usuario Kamehouse
+👤 Cliente: Usuario De Kamehouse
 💳 Método de Pago: Efectivo
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -351,7 +340,6 @@ Todos los derechos reservados
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `;
 
-    // Crear blob y descargar
     const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');

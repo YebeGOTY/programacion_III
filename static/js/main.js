@@ -129,18 +129,15 @@ function abrirModal(producto) {
     productoActual = producto;
     cantidadSeleccionada = 1;
     
-    // Rellenar información del modal
     modalImagen.src = producto.imagen;
     modalImagen.alt = producto.nombre || producto.titulo;
     modalTitulo.textContent = producto.nombre || producto.titulo;
     modalCodigo.textContent = producto.codigo;
     modalPrecio.textContent = `$${producto.precio}`;
     
-    // Categoría
     const categoriaNombre = producto.categoria.charAt(0).toUpperCase() + producto.categoria.slice(1);
     modalCategoria.textContent = categoriaNombre;
     
-    // Stock
     const estaAgotado = producto.stock <= 0;
     const stockBajo = producto.stock > 0 && producto.stock <= 3;
     
@@ -161,20 +158,17 @@ function abrirModal(producto) {
         btnAgregarModal.innerHTML = '<i class="bi bi-cart-plus-fill"></i><span>Agregar al Carrito</span>';
     }
     
-    // Resetear cantidad
     cantidadInput.value = 1;
     
-    // Actualizar límite máximo
     btnMas.disabled = producto.stock <= 1;
     
-    // Mostrar modal
     modalOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden'; // Prevenir scroll
+    document.body.style.overflow = 'hidden'; 
 }
 
 function cerrarModal() {
     modalOverlay.classList.remove('active');
-    document.body.style.overflow = ''; // Restaurar scroll
+    document.body.style.overflow = ''; 
     productoActual = null;
     cantidadSeleccionada = 1;
 }
@@ -188,14 +182,12 @@ function agregarDesdeModal() {
     const id = productoActual._id || productoActual.id;
     const enCarrito = productosEnCarrito.find(p => (p._id || p.id) === id);
     
-    // Verificar stock disponible
     const cantidadEnCarrito = enCarrito ? enCarrito.cantidad : 0;
     if (cantidadEnCarrito + cantidadSeleccionada > productoActual.stock) {
         notificar("No hay suficiente stock disponible", "#c91212");
         return;
     }
     
-    // Agregar o actualizar cantidad
     if (enCarrito) {
         enCarrito.cantidad += cantidadSeleccionada;
     } else {
@@ -234,10 +226,8 @@ categoriasTags.forEach(tag => {
         
         categoriaActual = e.currentTarget.dataset.categoria.toLowerCase();
 
-        // Cerrar menú lateral en móvil
         document.querySelector("aside").classList.remove("aside-visible");
         
-        // Limpiar buscador
         if (buscador) {
             buscador.value = '';
         }

@@ -140,7 +140,6 @@ def obtener_productos():
     categoria = request.args.get('categoria', None)
     
     if categoria and categoria != 'todos':
-        # Búsqueda case-insensitive
         productos = list(productos_collection.find({'categoria': {'$regex': f'^{categoria}$', '$options': 'i'}}))
     else:
         productos = list(productos_collection.find())
@@ -187,7 +186,6 @@ def obtener_producto(producto_id):
 def crear_producto():
     data = request.get_json()
     
-    # Validar datos requeridos
     if not all(k in data for k in ['nombre', 'precio', 'codigo', 'categoria']):
         return jsonify({'error': 'Faltan campos requeridos'}), 400
 
@@ -260,7 +258,6 @@ def eliminar_producto(producto_id):
     except:
         return jsonify({'error': 'ID inválido'}), 400
 
-# NUEVO ENDPOINT PARA PROCESAR COMPRA Y ACTUALIZAR STOCK
 @app.route('/api/procesar-compra', methods=['POST'])
 @login_required
 def procesar_compra():
@@ -271,7 +268,6 @@ def procesar_compra():
         if not productos_comprados:
             return jsonify({'error': 'No hay productos en el carrito'}), 400
         
-        # Verificar stock disponible antes de procesar
         for item in productos_comprados:
             producto_id = item.get('_id') or item.get('id')
             cantidad = item.get('cantidad', 0)
@@ -285,7 +281,6 @@ def procesar_compra():
                     'error': f'Stock insuficiente para {producto["nombre"]}. Disponible: {producto["stock"]}, Solicitado: {cantidad}'
                 }), 400
         
-        # Actualizar stock de cada producto
         for item in productos_comprados:
             producto_id = item.get('_id') or item.get('id')
             cantidad = item.get('cantidad', 0)
@@ -304,7 +299,6 @@ def procesar_compra():
         print(f"Error al procesar compra: {e}")
         return jsonify({'error': str(e)}), 500
 
-# NUEVO ENDPOINT PARA RESTABLECER STOCK DE TODOS LOS PRODUCTOS
 @app.route('/api/productos/restablecer-stock', methods=['POST'])
 @admin_required
 def restablecer_stock():
@@ -377,12 +371,10 @@ def actualizar_rol_usuario(usuario_id):
         if nuevo_rol not in ['admin', 'cliente']:
             return jsonify({'error': 'Rol inválido'}), 400
         
-        # Verificar que el usuario existe
         usuario = collection.find_one({'_id': ObjectId(usuario_id)})
         if not usuario:
             return jsonify({'error': 'Usuario no encontrado'}), 404
         
-        # Actualizar rol
         collection.update_one(
             {'_id': ObjectId(usuario_id)},
             {'$set': {'role': nuevo_rol}}
@@ -402,16 +394,13 @@ def actualizar_rol_usuario(usuario_id):
 def eliminar_usuario(usuario_id):
     """Eliminar un usuario"""
     try:
-        # Verificar que el usuario existe
         usuario = collection.find_one({'_id': ObjectId(usuario_id)})
         if not usuario:
             return jsonify({'error': 'Usuario no encontrado'}), 404
         
-        # Evitar que un admin se elimine a sí mismo
         if usuario['usuario'] == session.get('usuario'):
             return jsonify({'error': 'No puedes eliminar tu propia cuenta'}), 400
-        
-        # Eliminar usuario
+
         resultado = collection.delete_one({'_id': ObjectId(usuario_id)})
         
         if resultado.deleted_count == 0:
